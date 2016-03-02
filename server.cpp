@@ -40,6 +40,40 @@ void server::CreatorConnections()
 
 void server::slotReadClient()
 {
+    //qDebug() << "TSPServer::slotReadClient()";
 
+    QDataStream in(pClientSocket);
+    in.setVersion(QDataStream::Qt_5_4);
+    for (;;)
+    {
+        if (!m_nNextBlockSize)
+        {
+            if (pClientSocket->bytesAvailable() < sizeof(quint16))
+            {
+                break;
+            }
+            in >> m_nNextBlockSize;
+        }
+
+        if (pClientSocket->bytesAvailable() < m_nNextBlockSize)
+        {
+            break;
+        }
+
+
+        QString json_document;
+        in >> json_document;
+
+
+        QFile jsonFile("/home/kopylov/received.json");
+        jsonFile.open(QFile::Append);
+        QTextStream out(&jsonFile);
+        out << json_document;
+        jsonFile.close();
+
+        qDebug() << "Server Received:" << json_document;
+
+        m_nNextBlockSize = 0;
+    }
 }
 
