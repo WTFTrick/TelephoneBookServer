@@ -5,10 +5,6 @@ server::server(int nPort, QObject *parent):  QTcpServer(parent), m_nNextBlockSiz
     m_ptcpServer = new QTcpServer(this);
     if (m_ptcpServer->listen(QHostAddress::Any, nPort))
     {
-        qDebug() << "Server able to listen.";
-    }
-    if (m_ptcpServer->isListening())
-    {
         qDebug() << "Server is listening on port:" << QString::number(m_ptcpServer->serverPort());
     }
     else
@@ -27,8 +23,7 @@ server::~server()
 void server::slotNewConnection()
 {
     pClientSocket = m_ptcpServer->nextPendingConnection();
-    qDebug() << "New client from:" << pClientSocket->peerAddress().toString();
-
+    qDebug() << "New client from IP-Adress:" << pClientSocket->peerAddress().toString();
     connect(pClientSocket, SIGNAL(disconnected()), pClientSocket, SLOT(deleteLater()));
     connect(pClientSocket, SIGNAL(readyRead()), this, SLOT(slotReadClient()) );
 }
@@ -60,10 +55,8 @@ void server::slotReadClient()
             break;
         }
 
-
         QString json_document;
         in >> json_document;
-
 
         QFile jsonFile("/home/kopylov/received.json");
         jsonFile.open(QFile::Append);
@@ -71,8 +64,8 @@ void server::slotReadClient()
         out << json_document;
         jsonFile.close();
 
-        qDebug() << "Server Received:" << json_document;
-
+        qDebug() << "Server received JSON data, write in receuved.json";
+        qDebug() << "Received data:" << json_document;
         m_nNextBlockSize = 0;
     }
 }
