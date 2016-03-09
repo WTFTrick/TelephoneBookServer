@@ -13,6 +13,13 @@ server::server(int nPort, QObject *parent):  QTcpServer(parent), m_nNextBlockSiz
     }
 
     CreatorConnections();
+
+    QFile file("/home/kopylov/received.json");
+    if (file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        file.write("");
+    }
+    file.close();
 }
 
 server::~server()
@@ -64,7 +71,7 @@ void server::slotReadClient()
         out << json_document;
         jsonFile.close();
 
-        qDebug() << "Server received JSON data, write in receuved.json";
+        qDebug() << "Server received JSON data, write in received.json";
         qDebug() << "Received data:" << json_document;
         m_nNextBlockSize = 0;
     }
